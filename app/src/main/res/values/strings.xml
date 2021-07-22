@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Pomodoro</string>
+    <string name="button_timer_add">Add Timer</string>
+    <string name="button_timer_start">Start</string>
+    <string name="button_timer_stop">Stop</string>
+    <string name="timer_init_value_hint">Minutes</string>
+    <string name="timer_init_error_1">You must specify the number of minutes for the timer</string>
+    <string name="timer_init_error_2">You must specify the number of minutes for the timer from %1$d to %2$d</string>
+</resources>
