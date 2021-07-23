@@ -8,15 +8,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
 
 class ForegroundService : Service() {
 
+//    private var _notificationManager: NotificationManager? = null
+//
+//    private val notificationManager get() = requireNotNull(_notificationManager)
+
+    private lateinit var notificationManager: NotificationManager
+
     private var isServiceStarted = false
-    private var notificationManager: NotificationManager? = null
+
     private var job: Job? = null
 
     private val builder by lazy {
@@ -33,7 +38,7 @@ class ForegroundService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,20 +51,18 @@ class ForegroundService : Service() {
     }
 
     private fun processCommand(intent: Intent?) {
-        when (intent?.extras?.getString(COMMAND_ID) ?: INVALID) {
+        val command = intent?.extras?.getString(COMMAND_ID) ?: return
+        when (command) {
             COMMAND_START -> {
-                intent?.extras?.let {
-                    val startTime = it.getLong(START_TIME)
-                    val elapsedRealtime = it.getLong(ELAPSED_REALTIME)
-                    commandStart(startTime, elapsedRealtime)
-                }
+                val startTime = intent.extras?.getLong(START_TIME) ?: return
+                val clockTime = intent.extras?.getLong(CLOCK_TIME) ?: return
+                commandStart(startTime, clockTime)
             }
             COMMAND_STOP -> commandStop()
-            INVALID -> return
         }
     }
 
-    private fun commandStart(startTime: Long, elapsedRealtime: Long) {
+    private fun commandStart(startTime: Long, clockTime: Long) {
         if (isServiceStarted) {
             return
         }
@@ -67,21 +70,21 @@ class ForegroundService : Service() {
         try {
             moveToStartedState()
             startForegroundAndShowNotification()
-            continueTimer(startTime, elapsedRealtime)
+            continueTimer(startTime, clockTime)
         } finally {
             isServiceStarted = true
         }
     }
 
-    private fun continueTimer(startTime: Long, elapsedRealtime: Long) {
+    private fun continueTimer(startTime: Long, clockTime: Long) {
         job = GlobalScope.launch(Dispatchers.Main) {
             while (true) {
-                var remainingTime = startTime - (SystemClock.elapsedRealtime() - elapsedRealtime)
+                var remainingTime = startTime - (clockTime() - clockTime)
                 if (remainingTime < 0L) {
                     remainingTime = 0L
                 }
 
-                notificationManager?.notify(NOTIFICATION_ID, getNotification(remainingTime.displayTime()))
+                notificationManager.notify(NOTIFICATION_ID, getNotification(remainingTime.displayTime()))
 
                 if (remainingTime == 0L) {
                     commandStop()
@@ -129,7 +132,7 @@ class ForegroundService : Service() {
             val channelName = "pomodoro"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val notificationChannel = NotificationChannel(CHANNEL_ID, channelName, importance)
-            notificationManager?.createNotificationChannel(notificationChannel)
+            notificationManager.createNotificationChannel(notificationChannel)
         }
     }
 
@@ -143,6 +146,6 @@ class ForegroundService : Service() {
     private companion object {
         private const val CHANNEL_ID = "Channel_ID"
         private const val NOTIFICATION_ID = 777
-        private const val INTERVAL = 1000L
+        private const val INTERVAL = 250L
     }
 }

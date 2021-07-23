@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
             val startIntent = Intent(this, ForegroundService::class.java)
                 .putExtra(COMMAND_ID, COMMAND_START)
                 .putExtra(START_TIME, it.remainingTime)
-                .putExtra(ELAPSED_REALTIME, it.elapsedRealtime)
+                .putExtra(CLOCK_TIME, it.clockTime)
             startService(startIntent)
         }
     }
@@ -121,6 +121,6 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
     companion object {
         private const val MIN_MINUTES = 1
         private const val MAX_MINUTES = 1440
-        private const val INTERVAL = 100L
+        private const val INTERVAL = 250L
     }
 }

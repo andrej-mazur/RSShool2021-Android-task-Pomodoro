@@ -1,6 +1,6 @@
 package com.example.pomodoro
 
-private const val TIME_FORMAT = "%02d:%02d:%02d"
+import android.os.SystemClock
 
 fun Long.displayTime(): String {
     if (this <= 0L) {
@@ -15,3 +15,6 @@ fun Long.displayTime(): String {
 fun Long.minutesToMillis(): Long {
     return this * 60 * 1000
 }
+
+fun clockTime(): Long =
+    SystemClock.elapsedRealtime()

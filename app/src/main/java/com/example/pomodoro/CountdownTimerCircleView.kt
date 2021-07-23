@@ -69,9 +69,7 @@ class CountdownTimerCircleView @JvmOverloads constructor(
     }
 
     private companion object {
-
         private const val DEFAULT_COLOR = Color.RED
-
         private const val DEFAULT_STYLE = 0
     }
 }
