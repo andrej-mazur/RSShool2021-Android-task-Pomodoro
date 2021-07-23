@@ -87,7 +87,7 @@ class ForegroundService : Service() {
                 notificationManager.notify(NOTIFICATION_ID, getNotification(remainingTime.displayTime()))
 
                 if (remainingTime == 0L) {
-                    commandStop()
+                    job?.cancel()
                 }
 
                 delay(INTERVAL)
