@@ -29,7 +29,9 @@ class CountdownTimerAdapter(
             }
 
             override fun areContentsTheSame(oldItem: CountdownTimer, newItem: CountdownTimer): Boolean {
-                return oldItem.remainingTime == newItem.remainingTime && oldItem.isStarted == newItem.isStarted
+                return oldItem.remainingTime == newItem.remainingTime
+                        && oldItem.isStarted == newItem.isStarted
+                        && oldItem.isFinished == newItem.isFinished
             }
 
             override fun getChangePayload(oldItem: CountdownTimer, newItem: CountdownTimer) = Any()
