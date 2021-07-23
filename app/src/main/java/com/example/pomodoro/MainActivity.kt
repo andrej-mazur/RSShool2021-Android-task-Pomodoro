@@ -1,17 +1,17 @@
 package com.example.pomodoro
 
+import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pomodoro.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(), CountdownTimerListener {
+class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObserver {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -97,6 +98,24 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener {
     override fun add(id: Int, initTime: Long) {
         timers.add(CountdownTimer(id, initTime, initTime))
         timerAdapter.submitList(timers.toList())
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppBackgrounded() {
+        timers.find { it.isStarted }?.let {
+            val startIntent = Intent(this, ForegroundService::class.java)
+                .putExtra(COMMAND_ID, COMMAND_START)
+                .putExtra(START_TIME, it.remainingTime)
+                .putExtra(ELAPSED_REALTIME, it.elapsedRealtime)
+            startService(startIntent)
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppForegrounded() {
+        val stopIntent = Intent(this, ForegroundService::class.java)
+            .putExtra(COMMAND_ID, COMMAND_STOP)
+        startService(stopIntent)
     }
 
     companion object {

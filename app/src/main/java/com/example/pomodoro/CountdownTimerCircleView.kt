@@ -1,4 +1,4 @@
-package com.example.pomodoro.view
+package com.example.pomodoro
 
 import android.content.Context
 import android.graphics.Canvas
@@ -7,9 +7,8 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.AttrRes
-import com.example.pomodoro.R
 
-class CircleTimerView @JvmOverloads constructor(
+class CountdownTimerCircleView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0
@@ -44,7 +43,7 @@ class CircleTimerView @JvmOverloads constructor(
 
         paint.color = color
         paint.style = if (style == DEFAULT_STYLE) Paint.Style.FILL else Paint.Style.STROKE
-        paint.strokeWidth = 10F
+        paint.strokeWidth = 5F
     }
 
     override fun onDraw(canvas: Canvas) {
