@@ -1,5 +1,9 @@
 package com.example.pomodoro
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class CountdownTimer(
     val id: Int,
     val initTime: Long,
@@ -7,7 +11,7 @@ data class CountdownTimer(
     val clockTime: Long = 0L,
     val isStarted: Boolean = false,
     val isFinished: Boolean = false
-) {
+) : Parcelable {
 
     fun start(): CountdownTimer {
         val clockTime = clockTime()

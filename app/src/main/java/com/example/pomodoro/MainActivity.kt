@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
 
     private val timers = mutableListOf<CountdownTimer>()
 
-    private var nextId = 0
+    private var currentId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
                 return@setOnClickListener
             }
 
-            add(nextId++, initTimeInMinutes.minutesToMillis())
+            add(currentId++, initTimeInMinutes.minutesToMillis())
         }
 
         lifecycleScope.launch(Dispatchers.Main) {
@@ -57,6 +57,25 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
                     tick(it.id)
                 }
                 delay(INTERVAL)
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(CURRENT_ID, currentId)
+        outState.putParcelableArrayList(TIMERS, ArrayList(timers))
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        currentId = savedInstanceState.getInt(CURRENT_ID)
+        if (currentId > 0) {
+            val savedTimers = savedInstanceState.getParcelableArrayList<CountdownTimer>(TIMERS)
+            if (!savedTimers.isNullOrEmpty()) {
+                timers.clear()
+                timers.addAll(savedTimers)
+                timerAdapter.submitList(timers.toList())
             }
         }
     }
@@ -122,5 +141,8 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
         private const val MIN_MINUTES = 1
         private const val MAX_MINUTES = 1440
         private const val INTERVAL = 250L
+
+        private const val TIMERS = "TIMERS"
+        private const val CURRENT_ID = "CURRENT_ID"
     }
 }
