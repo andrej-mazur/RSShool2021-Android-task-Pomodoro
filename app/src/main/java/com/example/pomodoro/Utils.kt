@@ -13,7 +13,11 @@ fun Long.displayTime(): String {
 }
 
 fun Long.minutesToMillis(): Long {
-    return this * 60 * 1000
+    return (this * 60 * 1000)
+}
+
+fun Long.millisToSeconds(): Long {
+    return (this / 1000)
 }
 
 fun clockTime(): Long =

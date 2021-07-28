@@ -26,7 +26,7 @@ class CountdownTimerCircleView @JvmOverloads constructor(
 
     private var style = DEFAULT_STYLE
 
-    private val paint = Paint()
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     init {
         if (attrs != null) {

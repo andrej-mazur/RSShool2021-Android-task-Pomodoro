@@ -14,10 +14,6 @@ import kotlinx.coroutines.*
 
 class ForegroundService : Service() {
 
-//    private var _notificationManager: NotificationManager? = null
-//
-//    private val notificationManager get() = requireNotNull(_notificationManager)
-
     private lateinit var notificationManager: NotificationManager
 
     private var isServiceStarted = false

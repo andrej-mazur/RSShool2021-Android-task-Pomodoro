@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+
 class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObserver {
 
     private lateinit var binding: ActivityMainBinding
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
         setContentView(binding.root)
 
         binding.recycler.apply {
+            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
             adapter = timerAdapter
         }
@@ -93,7 +95,7 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
 
     override fun tick(id: Int) {
         timers.forEachIndexed { index, timer ->
-            timer.takeIf { it.id == id }?.let {
+            if (timer.id == id) {
                 timers[index] = timer.tick()
             }
         }
@@ -122,16 +124,29 @@ class MainActivity : AppCompatActivity(), CountdownTimerListener, LifecycleObser
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
         timers.find { it.isStarted }?.let {
-            val startIntent = Intent(this, ForegroundService::class.java)
-                .putExtra(COMMAND_ID, COMMAND_START)
-                .putExtra(START_TIME, it.remainingTime)
-                .putExtra(CLOCK_TIME, it.clockTime)
-            startService(startIntent)
+            startService(it.remainingTime, it.clockTime)
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onAppForegrounded() {
+        stopService()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onAppDestroyed() {
+        stopService()
+    }
+
+    private fun startService(remainingTime: Long, clockTime: Long) {
+        val startIntent = Intent(this, ForegroundService::class.java)
+            .putExtra(COMMAND_ID, COMMAND_START)
+            .putExtra(START_TIME, remainingTime)
+            .putExtra(CLOCK_TIME, clockTime)
+        startService(startIntent)
+    }
+
+    private fun stopService() {
         val stopIntent = Intent(this, ForegroundService::class.java)
             .putExtra(COMMAND_ID, COMMAND_STOP)
         startService(stopIntent)

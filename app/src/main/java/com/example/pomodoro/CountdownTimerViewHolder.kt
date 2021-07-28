@@ -15,47 +15,48 @@ class CountdownTimerViewHolder(
     private val resources: Resources
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(countdownTimer: CountdownTimer) {
-        binding.textTimer.text = countdownTimer.remainingTime.displayTime()
-        binding.circleTimer.initTime = countdownTimer.initTime
-        binding.circleTimer.currentTime = countdownTimer.remainingTime
 
-        if (countdownTimer.isStarted) {
-            with(binding) {
+    fun bind(countdownTimer: CountdownTimer) {
+        with(binding) {
+            textTimer.text = countdownTimer.remainingTime.displayTime()
+            circleTimer.initTime = countdownTimer.initTime
+            circleTimer.currentTime = countdownTimer.remainingTime
+
+            if (countdownTimer.isStarted) {
                 startPauseButton.text = resources.getString(R.string.button_timer_stop)
                 blinkingIndicator.isInvisible = false
                 (blinkingIndicator.background as? AnimationDrawable)?.start()
-            }
-        } else {
-            with(binding) {
+            } else {
                 startPauseButton.text = resources.getString(R.string.button_timer_start)
                 blinkingIndicator.isInvisible = true
                 (blinkingIndicator.background as? AnimationDrawable)?.stop()
             }
-        }
 
-        if (countdownTimer.isFinished) {
-            binding.startPauseButton.isEnabled = false
-            binding.row.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.purple_200))
-        } else {
-            binding.startPauseButton.isEnabled = true
-            binding.row.setBackgroundColor(MaterialColors.getColor(itemView, R.attr.backgroundColor, Color.WHITE))
+            if (countdownTimer.isFinished) {
+                startPauseButton.isEnabled = false
+                row.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.purple_200))
+            } else {
+                startPauseButton.isEnabled = true
+                row.setBackgroundColor(MaterialColors.getColor(itemView, R.attr.backgroundColor, Color.WHITE))
+            }
         }
 
         initListeners(countdownTimer)
     }
 
     private fun initListeners(countdownTimer: CountdownTimer) {
-        binding.startPauseButton.setOnClickListener {
-            if (countdownTimer.isStarted) {
-                listener.stop(countdownTimer.id)
-            } else {
-                listener.start(countdownTimer.id)
+        with(binding) {
+            startPauseButton.setOnClickListener {
+                if (countdownTimer.isStarted) {
+                    listener.stop(countdownTimer.id)
+                } else {
+                    listener.start(countdownTimer.id)
+                }
             }
-        }
 
-        binding.deleteButton.setOnClickListener {
-            listener.delete(countdownTimer.id)
+            deleteButton.setOnClickListener {
+                listener.delete(countdownTimer.id)
+            }
         }
     }
 }

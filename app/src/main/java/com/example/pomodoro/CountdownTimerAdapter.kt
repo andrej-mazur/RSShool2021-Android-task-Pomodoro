@@ -29,7 +29,7 @@ class CountdownTimerAdapter(
             }
 
             override fun areContentsTheSame(oldItem: CountdownTimer, newItem: CountdownTimer): Boolean {
-                return oldItem.remainingTime == newItem.remainingTime
+                return oldItem.remainingTime.millisToSeconds() == newItem.remainingTime.millisToSeconds()
                         && oldItem.isStarted == newItem.isStarted
                         && oldItem.isFinished == newItem.isFinished
             }
